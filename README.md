@@ -16,16 +16,20 @@ Before starting, ensure you have the following:
 
 ```bash
 ├── .gitignore
-└── app
-    ├── Dockerfile
-    ├── blog_app
-    │   ├── __init__.py
-    │   ├── asgi.py
-    │   ├── settings.py
-    │   ├── urls.py
-    │   └── wsgi.py
-    ├── manage.py
-    └── requirements.txt
+└── app   
+│   ├── Dockerfile
+│   ├── blog_app
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── manage.py
+│   ├── db.sqlite3
+│   └── requirements.txt
+├── README.md
+├── terraform
+
 ```
 
 ## Tech Stack
