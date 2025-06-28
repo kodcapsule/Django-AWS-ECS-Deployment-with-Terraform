@@ -15,8 +15,8 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "django-app"
   network_mode             = "awsvpc" # Required for Fargate
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "${var.fargate_cpu}"
-  memory                   = "${var.fargate_memory}"
+  cpu                      = var.fargate_cpu
+  memory                   = var.fargate_memory
   execution_role_arn       = aws_iam_role.ecs-task-execution-role.arn
   task_role_arn            = aws_iam_role.ecs-task-execution-role.arn
   container_definitions    = data.template_file.app.rendered

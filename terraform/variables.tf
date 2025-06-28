@@ -37,7 +37,7 @@ variable "private_subnet_2_cidr" {
 variable "availability_zones" {
   description = "Availability zones"
   type        = list(string)
-  default     = ["us-west-1b", "us-west-1c"]
+  default     = ["us-east-1a", "us-east-1b"]
 }
 
 
@@ -49,12 +49,6 @@ variable "health_check_path" {
 }
 
 # ecs
-
-variable "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  default     = "production"
-}
-
 
 variable "log_retention_in_days" {
   default = 30
@@ -68,7 +62,7 @@ variable "ecs_cluster_name" {
 
 variable "docker_image_url_django" {
   description = "Docker image to run in the ECS cluster"
-  default     = "<AWS_ACCOUNT_ID>.dkr.ecr.us-west-1.amazonaws.com/django-app:latest"
+  default     = "650251710981.dkr.ecr.us-west-1.amazonaws.com/django-app:latest"
 }
 
 variable "app_count" {
@@ -84,4 +78,23 @@ variable "fargate_cpu" {
 variable "fargate_memory" {
   description = "Amount of memory for Fargate task. E.g., '512' (0.5GB)"
   default     = "512"
+}
+
+
+
+# ECS service auto scaling
+
+variable "autoscale_min" {
+  description = "Minimum autoscale (number of tasks)"
+  default     = "1"
+}
+
+variable "autoscale_max" {
+  description = "Maximum autoscale (number of tasks)"
+  default     = "10"
+}
+
+variable "autoscale_desired" {
+  description = "Desired number of tasks to run initially"
+  default     = "4"
 }

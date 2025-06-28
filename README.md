@@ -62,9 +62,15 @@ Before starting, ensure you have the following:
     mkdir app && cd app
 ```
 
-4. Install Django
+4.a Install Django
 ```bash
     pip install django
+```
+
+4.b
+Install gunicorn
+```bash
+ pip install gunicorn
 ```
 5. Create a django blog app
 ```bash
@@ -74,16 +80,34 @@ Before starting, ensure you have the following:
 ```bash
     django-admin startproject blog_app .
 ```
-
-## Step 2: Build and Push Docker Image to ECR
-1. Build the docker image 
+7. create the requirements.txt file for your django app
 ```bash
-docker build -t <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/django-app:latest .
+pip freeze > requirements.txt
 ```
 
-Be sure to replace <AWS_ACCOUNT_ID> with your AWS account ID.
-We'll be using the us-west-1 region throughout this tutorial. Feel free to change this if you'd like.
 
+### Dockerize  your app locally
+
+1. build your docker image 
+```bash
+docker build -t django_blog_app .
+```
+
+run the docker container
+```bash
+ docker run \
+ -e SECRET_KEY="django-insecure-$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" \
+  -p 8000:8000 django_app
+```
+access your app from this url [blog app]( http://127.0.0.1:8000/)
+
+## Step 2: Build and Push Docker Image to ECR
+
+1. create a ECR repository 
+
+```bash
+aws ecr create-repository --repository-name django-app --region us-east-1 --profile wewoli
+```
 2. Authenticate the Docker CLI to use the ECR registry:
 ```bash
     aws ecr get-login-password --region <REGION>| docker login \
@@ -91,7 +115,15 @@ We'll be using the us-west-1 region throughout this tutorial. Feel free to chang
     <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com
 ```
 
-3. Push the image:
+3. Build the docker image 
+```bash
+docker build -t <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/django-app:latest .
+```
+
+Be sure to replace <AWS_ACCOUNT_ID> with your AWS account ID.
+We'll be using the us-west-1 region throughout this tutorial. Feel free to change this if you'd like.
+
+4. Push the image:
 ```bash
     docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-west-1.amazonaws.com/django-app:latest
 ```
@@ -129,3 +161,10 @@ terraform/
 ## Step 6: Configure Domain and SSL (Optional)
 
 ## Step 7: Monitoring and Logging
+
+
+
+## ERRORS and Troubleshooting 
+ERROR: failed to solve: python:3.12.0-slim-bookworm: failed to resolve source metadata for docker.io/library/python:3.12.0-slim-bookworm: failed to do request: Head "https://registry-1.docker.io/v2/library/python/manifests/3.12.0-slim-bookworm": net/http: TLS handshake timeout
+
+unexpected status from POST request to https://650251710981.dkr.ecr.us-east-1.amazonaws.com/v2/django-app/blobs/uploads/: 404 Not Found
