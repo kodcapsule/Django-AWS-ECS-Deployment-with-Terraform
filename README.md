@@ -123,6 +123,7 @@ docker build -t <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/django-app:lates
 Be sure to replace <AWS_ACCOUNT_ID> with your AWS account ID.
 We'll be using the us-west-1 region throughout this tutorial. Feel free to change this if you'd like.
 
+
 4. Push the image:
 ```bash
     docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-west-1.amazonaws.com/django-app:latest
