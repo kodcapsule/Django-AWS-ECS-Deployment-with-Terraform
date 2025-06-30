@@ -14,20 +14,24 @@ def get_current_task_definition(client, cluster, service):
 @click.option("--image", help="Docker image URL for the updated application", required=True)
 @click.option("--profile", help="AWS CLI profile to use", default="wewoli")
 @click.option("--region", help="AWS region", default="us-east-1")
-def deploy(cluster, service, image):
-    client = boto3.client("ecs")
+def deploy(cluster, service, image, profile, region):
+
+    client = boto3.client("ecs", region_name=region)
+    session = boto3.Session(profile_name=profile)
 
     # Fetch the current task definition
     try:
         print("Fetching current task definition...")
         response = get_current_task_definition(client, cluster, service)
         container_definition = response["taskDefinition"]["containerDefinitions"][0].copy()
+        print(f"Current task definition fetched: {response['taskDefinition']['taskDefinitionArn']}")
     except client.exceptions.ClientError as e:
         print(f"Error fetching task definition: {e}")
 
     # Update the container definition with the new image
     print("Updating container definition with new image...")
     if "image" not in container_definition:
+        print(f"Image key not found in container definition: {container_definition}")
         print("Image key not found in container definition. Adding it now.")
     container_definition["image"] = image
     print(f"Updated image to: {image}")
