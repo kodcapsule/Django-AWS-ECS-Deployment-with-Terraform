@@ -3,10 +3,10 @@
 
 ## ✅ Prerequisites
 Before starting, ensure you have the following:
-- AWS CLI installed and configured with appropriate permissions
-- Terraform installed (version v1.5.7)
-- Docker installed
-- Python (v3.12.0)
+- AWS CLI installed and configured with appropriate permissions. [Installing or updating to the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- Terraform installed (version v1.5.7). [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+- Docker installed. [Install Docker Engine](https://docs.docker.com/engine/install/)
+- Python (v3.12.0)[https://www.python.org/downloads/](https://www.python.org/downloads/)
 - Django ( v4.2.7)
 - Basic understanding of AWS services (VPC, ECS, RDS, ALB)
 
@@ -32,18 +32,20 @@ Before starting, ensure you have the following:
 
 ```
 
-## Tech Stack
+## Tech Stack Used in this Project
 
-| Component           | AWS Service |
+| Component           |  Service |
 | ------------------- | ----------- |
-| Containers          | ECS Fargate |
-| Image Storage       | ECR         |
+|Container orchestration          | Amazon Elastic Container Service (ECS) |
+| Image Storage       | Amazon Elastic Container Registry (ECR)  |
 | Database (Optional) | RDS         |
 | Networking          | VPC, ALB,SGs|
 | Infra as Code       | Terraform   |
 | Monitoring and Logging      | CloudWatch   |
 
 ## Step 1: Prepare Your Django Application
+
+In this first step, we will create a Django application from scratch and dockerize the application using Docker. If you have an existing Django project that you will like to use , you can skip this first step if not lets get started. 
 
 ### Create a new Django app
 1. Create a vitual environment 
@@ -54,7 +56,7 @@ Before starting, ensure you have the following:
 ```bash
     source env/Scripts/activate
 ```
-3. Create a directory for your app
+3. Create a directory for your app and cd into the directory
 ```bash
     mkdir app && cd app
 ```
@@ -75,9 +77,9 @@ Install gunicorn
 ```bash
     django-admin startproject blog_app .
 ```
-access the app using this url [http://127.0.0.1:8000/]( http://127.0.0.1:8000/)
+access the app using this url [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
-7. create the requirements.txt file for your django app
+7. create a requirements file for your django app
 ```bash
 pip freeze > requirements.txt
 ```
@@ -85,6 +87,7 @@ pip freeze > requirements.txt
 ### Dockerize  your Django  app 
 
 1. Create a Dockerfile
+In the app directory create a `Dockerfile`, copy and paste the code bellow and paste in the dockerfile
 ```bash
 # Build stage
 FROM python:3.12.0-slim-bookworm
@@ -119,7 +122,7 @@ CMD ["gunicorn", "--bind", "0.0.0.0:8000", "blog_app.wsgi:application"]
 docker build -t django_blog_app .
 ```
 
-run the docker container
+2. run the docker container
 ```bash
  docker run \
  -e SECRET_KEY="django-insecure-$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" \
@@ -127,12 +130,12 @@ run the docker container
 ```
 access your app from your docker container using this url [http://127.0.0.1:8000/]( http://127.0.0.1:8000/)
 
-## Step 2: Build and Push Docker Image to ECR
+## Step 2: Build and Push your Django app  Image to AWS ECR. 
 
 1. create a ECR repository: 
 
 ```bash
-aws ecr create-repository --repository-name django-app --region <REGION> --profile wewoli
+aws ecr create-repository --repository-name django-app --region <REGION> --profile <PROFILE_NAME>
 ```
 2. Authenticate the Docker CLI to use the ECR registry:
 ```bash
@@ -153,6 +156,11 @@ We'll be using the us-west-1 region throughout this tutorial. Feel free to chang
 ```bash
     docker push <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/django-app:latest
 ```
+[!IMPORTANT]
+> Replace <AWS_ACCOUNT_ID> with your AWS account ID.
+> Replace <REGION> with your prefered AWS region
+> Replace <PROFILE_NAME> with the profile configured with AWS CLI. If you don't specify a profile , the default profile will be used
+> We'll be using the us-east-1 region throughout this tutorial. Feel free to change this if you'd like.
 
 
 ## Step 3: Create Terraform Infrastructure
@@ -169,7 +177,7 @@ terraform/
 ├── ecs.tf
 ├── rds.tf
 ├── alb.tf
-├── s3.tf
+├── auto_scaling.tf
 └── security_groups.tf
 ```
 | Component           | AWS Service |
